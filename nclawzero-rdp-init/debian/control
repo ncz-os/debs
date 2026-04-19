@@ -1,0 +1,23 @@
+Source: nclawzero-rdp-init
+Section: admin
+Priority: optional
+Maintainer: Jason Perlow <jperlow@nvidia.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: nclawzero-rdp-init
+Architecture: all
+Depends:
+ ${misc:Depends},
+ openssl,
+ passwd,
+ adduser
+Description: nclawzero first-boot RDP/TLS setup
+ Generates a self-signed TLS cert for Weston's RDP backend and
+ seeds the pi user's password from /etc/nclawzero/initial-password
+ (default: 'nclawzero' — change after flash).
+ .
+ Creates /var/lib/nclawzero/rdp-init.done sentinel to ensure
+ idempotent first-boot behavior. Safe to include in both headless
+ and desktop images.

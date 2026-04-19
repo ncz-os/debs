@@ -1,0 +1,28 @@
+Source: nemoclaw-firstboot
+Section: admin
+Priority: optional
+Maintainer: Jason Perlow <jperlow@nvidia.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: nemoclaw-firstboot
+Architecture: all
+Depends:
+ ${misc:Depends},
+ git,
+ bash,
+ nodejs (>= 22),
+ npm,
+ adduser,
+ ca-certificates,
+ patch
+Description: nemoclaw first-boot git clone + npm install glue
+ Clones https://github.com/NVIDIA/nemoclaw at first boot into
+ /var/lib/nemoclaw, runs npm install, applies any runtime patches
+ shipped in /etc/nemoclaw/patches/, and enables ff-only git fetch on
+ every subsequent boot so the device tracks upstream main HEAD.
+ .
+ Replaces the separate nemoclaw-core + nemoclaw-firstboot Yocto recipes
+ with a single glue package; source is fetched at boot rather than
+ embedded in the deb to genuinely track upstream master.

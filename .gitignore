@@ -1,0 +1,19 @@
+# Debian build artifacts
+*.deb
+*.buildinfo
+*.changes
+*.dsc
+*.tar.gz
+*/debian/.debhelper/
+*/debian/debhelper-build-stamp
+*/debian/files
+*/debian/*.debhelper
+*/debian/*.debhelper.log
+*/debian/*.substvars
+*/debian/<pkg>/
+# Per-package install trees
+zeroclaw/debian/zeroclaw/
+zeroclaw/zeroclaw
+zeroclaw/web/
+nclawzero-rdp-init/debian/nclawzero-rdp-init/
+nemoclaw-firstboot/debian/nemoclaw-firstboot/

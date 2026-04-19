@@ -1,0 +1,11 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: nclawzero-rdp-init
+Source: https://gitlab.internal.nvidia.com/perlowja/nclawzero-debs
+
+Files: *
+Copyright: 2026 Jason Perlow <jperlow@nvidia.com>
+License: Apache-2.0
+
+License: Apache-2.0
+ On Debian systems, the full text of the Apache-2.0 license can be found
+ in /usr/share/common-licenses/Apache-2.0.

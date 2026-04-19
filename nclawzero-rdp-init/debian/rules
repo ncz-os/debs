@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	install -Dm0755 files/nclawzero-rdp-init.sh \
+	    $(CURDIR)/debian/nclawzero-rdp-init/usr/bin/nclawzero-rdp-init
+	install -d $(CURDIR)/debian/nclawzero-rdp-init/etc/nclawzero
+	install -Dm0600 files/initial-password \
+	    $(CURDIR)/debian/nclawzero-rdp-init/etc/nclawzero/initial-password
