@@ -1,0 +1,10 @@
+nemoclaw-firstboot (1.0.0-1) trixie; urgency=medium
+
+  * Initial Debian packaging (ported from Yocto recipes).
+  * Collapses nemoclaw-core + nemoclaw-firstboot into one glue package.
+  * Clones upstream NVIDIA/nemoclaw at first boot and ff-only updates on
+    every boot to track main HEAD (Node.js source, no compile step).
+  * Ships three runtime patches in /etc/nemoclaw/patches/ applied with
+    'git apply --3way' fallback to 'patch --fuzz=3'.
+
+ -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 18:50:00 +0000

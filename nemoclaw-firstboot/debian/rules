@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# First-boot script
+	install -Dm0755 files/nemoclaw-firstboot.sh \
+	    $(CURDIR)/debian/nemoclaw-firstboot/usr/bin/nemoclaw-firstboot
+	# Runtime-apply patches (do not apply at build — apply on-device after
+	# ff-only git update so rebase failures can be caught on the box)
+	install -d $(CURDIR)/debian/nemoclaw-firstboot/etc/nemoclaw/patches
+	install -Dm0644 files/0001-fix-snapshot-symlink-protection.patch \
+	    $(CURDIR)/debian/nemoclaw-firstboot/etc/nemoclaw/patches/0001-fix-snapshot-symlink-protection.patch
+	install -Dm0644 files/0002-fix-config-file-permissions.patch \
+	    $(CURDIR)/debian/nemoclaw-firstboot/etc/nemoclaw/patches/0002-fix-config-file-permissions.patch
+	install -Dm0644 files/0003-feat-agent-defs-zeroclaw.patch \
+	    $(CURDIR)/debian/nemoclaw-firstboot/etc/nemoclaw/patches/0003-feat-agent-defs-zeroclaw.patch
+	# nemoclaw service + conf
+	install -Dm0644 files/nemoclaw.conf \
+	    $(CURDIR)/debian/nemoclaw-firstboot/etc/nemoclaw/nemoclaw.conf
+	# State dir
+	install -d $(CURDIR)/debian/nemoclaw-firstboot/var/lib/nemoclaw

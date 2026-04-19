@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        if ! getent passwd nemoclaw >/dev/null; then
+            adduser --system --group \
+                    --home /var/lib/nemoclaw \
+                    --shell /usr/sbin/nologin \
+                    --no-create-home \
+                    --quiet \
+                    nemoclaw
+        fi
+        chown -R nemoclaw:nemoclaw /var/lib/nemoclaw
+        chown -R nemoclaw:nemoclaw /etc/nemoclaw 2>/dev/null || true
+        ;;
+esac
+
+#DEBHELPER#
