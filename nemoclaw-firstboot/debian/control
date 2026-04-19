@@ -12,7 +12,7 @@ Depends:
  ${misc:Depends},
  git,
  bash,
- nodejs (>= 22),
+ nodejs (>= 20),
  npm,
  adduser,
  ca-certificates,
