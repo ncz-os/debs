@@ -1,3 +1,9 @@
+nemoclaw-firstboot (1.0.1-1) trixie; urgency=medium
+
+  * Loosen nodejs dep to >= 20 (Debian trixie ships 20.19.2)
+
+ -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 14:52:12 -0400
+
 nemoclaw-firstboot (1.0.0-1) trixie; urgency=medium
 
   * Initial Debian packaging (ported from Yocto recipes).
