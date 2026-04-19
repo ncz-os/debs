@@ -16,6 +16,14 @@ case "$1" in
         chown -R zeroclaw:zeroclaw /var/lib/zeroclaw
         chown zeroclaw:zeroclaw /etc/zeroclaw/config.toml /etc/zeroclaw/env
         chmod 0600 /etc/zeroclaw/config.toml /etc/zeroclaw/env
+        # Symlink /etc canonical config into zeroclaw's expected $HOME/.zeroclaw/
+        # path. The 0.7.x binary auto-generates a config there if missing;
+        # shipping our /etc config as the symlink target means our defaults
+        # (Together AI, [::]:42617, web_dist_dir) actually load instead of
+        # the binary's built-in fallbacks.
+        install -d -o zeroclaw -g zeroclaw -m 0700 /var/lib/zeroclaw/.zeroclaw
+        ln -sfn /etc/zeroclaw/config.toml /var/lib/zeroclaw/.zeroclaw/config.toml
+        chown -h zeroclaw:zeroclaw /var/lib/zeroclaw/.zeroclaw/config.toml
         ;;
     abort-upgrade|abort-remove|abort-deconfigure)
         ;;

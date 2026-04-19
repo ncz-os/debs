@@ -1,3 +1,9 @@
+nemoclaw-firstboot (1.0.2-1) trixie; urgency=medium
+
+  * nemoclaw-firstboot: clone upstream if /opt/nemoclaw missing
+
+ -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 19:36:04 -0400
+
 nemoclaw-firstboot (1.0.1-1) trixie; urgency=medium
 
   * Loosen nodejs dep to >= 20 (Debian trixie ships 20.19.2)

@@ -25,8 +25,20 @@ fi
 
 echo "=== NemoClaw first-boot provisioning: $(date) ===" >> "$LOGFILE"
 
-# --- 1. Attempt online update, fall back silently ---------------------
-if [ -d "$NEMOCLAW_DIR/.git" ]; then
+# --- 1. Clone (if missing) or ff-update --------------------------------
+# Deb-world: the deb ships only glue — actual NemoClaw source is cloned
+# at first boot to genuinely track upstream master.
+if [ ! -d "$NEMOCLAW_DIR/.git" ]; then
+    echo "Cloning NemoClaw into $NEMOCLAW_DIR ..." >> "$LOGFILE"
+    mkdir -p "$(dirname "$NEMOCLAW_DIR")"
+    if git clone --depth 1 --branch main \
+         https://github.com/NVIDIA/nemoclaw.git "$NEMOCLAW_DIR" >> "$LOGFILE" 2>&1; then
+        echo "  cloned at $(cd "$NEMOCLAW_DIR" && git rev-parse --short HEAD)" >> "$LOGFILE"
+    else
+        echo "ERROR: initial clone failed (offline?). Aborting firstboot." >> "$LOGFILE"
+        exit 1
+    fi
+else
     echo "Attempting online ff update of $NEMOCLAW_DIR ..." >> "$LOGFILE"
     if cd "$NEMOCLAW_DIR" \
         && git fetch --depth 1 origin main >> "$LOGFILE" 2>&1 \
@@ -34,10 +46,8 @@ if [ -d "$NEMOCLAW_DIR/.git" ]; then
         echo "  updated to $(git rev-parse --short HEAD)" >> "$LOGFILE"
     else
         PINNED=$(git rev-parse --short HEAD 2>/dev/null || echo unknown)
-        echo "  offline or fetch failed; running Yocto-pinned version ($PINNED)" >> "$LOGFILE"
+        echo "  offline or fetch failed; running pinned version ($PINNED)" >> "$LOGFILE"
     fi
-else
-    echo "WARN: $NEMOCLAW_DIR/.git missing — expected pre-cloned tree from nemoclaw-core recipe" >> "$LOGFILE"
 fi
 
 cd "$NEMOCLAW_DIR"
