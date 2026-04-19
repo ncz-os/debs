@@ -1,0 +1,97 @@
+# nclawzero-debs GitLab CI
+#
+# Three jobs run on push to master:
+#  1. track-master (scheduled nightly): detect new zeroclaw betas + bump
+#     debian/changelog via dch, commit, trigger a build via resource_group.
+#  2. build-{arm64,amd64}: dpkg-buildpackage each deb for each arch.
+#  3. publish: rsync artifacts to ARGOS and run reprepro includedeb to
+#     push to the internal apt repo (http://192.168.207.22:8081/apt).
+#
+# Requires GitLab runner tagged "argos" (registered on ARGOS with
+# docker + sshpass + rsync access to /mnt/argonas/apt).
+
+stages:
+  - track
+  - build
+  - publish
+
+variables:
+  DEBEMAIL: "jperlow@nvidia.com"
+  DEBFULLNAME: "Jason Perlow"
+  APT_HOST: "jasonperlow@192.168.207.22"
+  APT_BASEDIR: "/mnt/argonas/apt"
+
+# Nightly: check upstream for new zeroclaw beta, bump, commit, trigger build.
+track-zeroclaw:
+  stage: track
+  tags: [argos]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  image: debian:trixie
+  before_script:
+    - apt-get update -q && apt-get install -y -q curl jq git devscripts
+  script:
+    - ./ci/bump-zeroclaw.sh
+
+# Per-package matrix build
+.build-template:
+  stage: build
+  tags: [argos]
+  image: debian:trixie
+  before_script:
+    - dpkg --add-architecture ${DEB_ARCH}
+    - apt-get update -q
+    - apt-get install -y -q devscripts debhelper dpkg-dev curl ca-certificates
+    - |
+      if [ "$DEB_ARCH" = "arm64" ] && [ "$(dpkg --print-architecture)" != "arm64" ]; then
+        apt-get install -y -q binutils-aarch64-linux-gnu libc6:arm64 libgcc-s1:arm64
+      fi
+  script:
+    - cd ${PKG}
+    - dpkg-buildpackage -a${DEB_ARCH} -us -uc -b
+    - mkdir -p ../out/${DEB_ARCH}
+    - mv ../*.deb ../*.buildinfo ../*.changes ../out/${DEB_ARCH}/ 2>/dev/null || true
+  artifacts:
+    paths: [out/]
+    expire_in: 1 week
+
+build:zeroclaw:arm64:
+  extends: .build-template
+  variables: { PKG: zeroclaw, DEB_ARCH: arm64 }
+build:zeroclaw:amd64:
+  extends: .build-template
+  variables: { PKG: zeroclaw, DEB_ARCH: amd64 }
+build:rdp-init:
+  extends: .build-template
+  variables: { PKG: nclawzero-rdp-init, DEB_ARCH: all }
+build:firstboot:
+  extends: .build-template
+  variables: { PKG: nemoclaw-firstboot, DEB_ARCH: all }
+build:cerberus-helper:
+  extends: .build-template
+  variables: { PKG: nclawzero-cerberus-helper, DEB_ARCH: all }
+
+# Publish all built debs to reprepro on ARGONAS via ARGOS
+publish-to-apt:
+  stage: publish
+  tags: [argos]
+  image: debian:trixie
+  needs:
+    - build:zeroclaw:arm64
+    - build:zeroclaw:amd64
+    - build:rdp-init
+    - build:firstboot
+    - build:cerberus-helper
+  before_script:
+    - apt-get update -q && apt-get install -y -q rsync openssh-client sshpass
+  script:
+    - |
+      for f in out/*/*.deb; do
+        echo "Publishing $f"
+        sshpass -p "$APT_SSH_PASS" rsync -av -e "ssh -o StrictHostKeyChecking=accept-new" \
+          "$f" "$APT_HOST:/tmp/"
+        sshpass -p "$APT_SSH_PASS" ssh -o StrictHostKeyChecking=accept-new "$APT_HOST" \
+          "reprepro -b $APT_BASEDIR includedeb trixie /tmp/$(basename $f) && rm -f /tmp/$(basename $f)"
+      done
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'

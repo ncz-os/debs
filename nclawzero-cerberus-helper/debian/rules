@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	install -Dm0755 files/ask-cerberus \
+	    $(CURDIR)/debian/nclawzero-cerberus-helper/usr/bin/ask-cerberus
+	install -Dm0644 files/cerberus.conf \
+	    $(CURDIR)/debian/nclawzero-cerberus-helper/etc/nclawzero/cerberus.conf

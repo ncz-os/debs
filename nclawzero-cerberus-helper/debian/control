@@ -1,0 +1,22 @@
+Source: nclawzero-cerberus-helper
+Section: utils
+Priority: optional
+Maintainer: Jason Perlow <jperlow@nvidia.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+
+Package: nclawzero-cerberus-helper
+Architecture: all
+Depends:
+ ${misc:Depends},
+ curl,
+ python3
+Description: CERBERUS inference helper (idempotent curl wrapper)
+ Thin wrapper around a local OpenAI-compatible inference endpoint
+ (e.g. vLLM / llama.cpp server). Config-driven, no credentials, safe
+ to re-run. Demonstrates the local consultative tier alongside the
+ default cloud-consultative path.
+ .
+ Edit /etc/nclawzero/cerberus.conf to point at a different endpoint.
+ Defaults to the author's lab inference server (CERBERUS, RTX 4500).
