@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    purge)
+        # Remove state dir (but not user data workspace on purge? debatable)
+        rm -rf /var/lib/zeroclaw
+        # Remove config dir if empty
+        rmdir --ignore-fail-on-non-empty /etc/zeroclaw 2>/dev/null || true
+        # Don't deluser — other zeroclaw-* packages may still need it
+        ;;
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        ;;
+esac
+
+#DEBHELPER#

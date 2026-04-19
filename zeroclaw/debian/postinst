@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        # Create zeroclaw system user (home = /var/lib/zeroclaw, nologin)
+        if ! getent passwd zeroclaw >/dev/null; then
+            adduser --system --group \
+                    --home /var/lib/zeroclaw \
+                    --shell /usr/sbin/nologin \
+                    --no-create-home \
+                    --quiet \
+                    zeroclaw
+        fi
+        # Ensure state + config paths owned by zeroclaw
+        chown -R zeroclaw:zeroclaw /var/lib/zeroclaw
+        chown zeroclaw:zeroclaw /etc/zeroclaw/config.toml /etc/zeroclaw/env
+        chmod 0600 /etc/zeroclaw/config.toml /etc/zeroclaw/env
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+esac
+
+#DEBHELPER#

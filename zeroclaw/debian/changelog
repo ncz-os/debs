@@ -1,0 +1,11 @@
+zeroclaw (0.7.3~beta.1051-1) trixie; urgency=medium
+
+  * Initial packaging tracking upstream prereleases.
+  * Downloads pre-built binary from github.com/zeroclaw-labs/zeroclaw
+    releases (aarch64-unknown-linux-gnu or x86_64-unknown-linux-gnu).
+  * Config file: /etc/zeroclaw/config.toml (schema v0.7.3, Together AI
+    default — MiniMax-M2.7 narrative, Gemma-4 consultative).
+  * systemd unit: zeroclaw.service (User=zeroclaw, --config-dir).
+  * Includes bundled web dashboard at /usr/share/zeroclaw/web-dist.
+
+ -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 18:30:00 +0000
