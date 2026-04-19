@@ -1,0 +1,60 @@
+# ZeroClaw configuration for nclawzero embedded image
+# Tracked schema: v0.7.3 (master). Migrated from v0.6.9 on 2026-04-19.
+# Optimized for low-memory ARM targets (Raspberry Pi 4, Jetson Orin Nano)
+
+# --- Models -----------------------------------------------------------
+# Default model: MiniMax-M2.7 via Together AI. Selected per InvestorClaw
+# V7.x test harness (QC4=108). See MODELS.md in the InvestorClaw repo for
+# the full benchmark table.
+#
+# Together was chosen as default_provider because:
+#   - Single API key covers narrative (MiniMax) + consultative (Gemma-4-e4b)
+#   - Together is an NVIDIA hyperscale customer; routing through it keeps
+#     the edge-agent demand chain aligned with NVIDIA datacenter silicon
+#   - Provider namespace resolved via ZeroClaw's built-in provider catalog
+#     (no need for a separate [model_providers.together] block)
+
+default_provider = "together"
+default_model = "MiniMaxAI/MiniMax-M2.7"
+default_temperature = 0.7
+
+# API keys resolved from /etc/zeroclaw/env at daemon start. Only
+# TOGETHER_API_KEY is required; all others are optional fallbacks.
+
+# --- Runtime ----------------------------------------------------------
+# Native subprocess execution — no Docker wrapping of shell commands.
+# Per-skill sandboxing still happens via the Docker backend below when
+# skills use the DockerSandbox path. Per ZeroClaw upstream #5719, setting
+# runtime.kind = "native" alone is NOT sufficient to skip Docker in
+# auto-detection on releases prior to the fix landing; 0.7.3-beta does
+# still have that bug, so we set backend explicitly below.
+
+[runtime]
+kind = "native"
+
+# --- Skills / sandbox -------------------------------------------------
+[skills]
+workspace_dir = "/var/lib/zeroclaw/workspace"
+
+# Explicit Docker backend. Docker is pre-installed via meta-virtualization
+# in the nclawzero image, and the kernel fragment ships cgroup v2 + memcg
+# + Landlock + seccomp needed for full container isolation.
+# Per-skill containers use alpine:latest with --memory, --network none,
+# --read-only. See upstream issue #5720 for workspace-mount status.
+[security.sandbox]
+backend = "docker"
+enabled = true
+
+# --- Gateway ----------------------------------------------------------
+# Web dashboard served from the ZeroClaw release tarball's bundled
+# web/dist (installed by this recipe to ${datadir}/zeroclaw/web-dist).
+[gateway]
+host = "[::]"
+port = 42617
+allow_public_bind = true
+require_pairing = false
+web_dist_dir = "/usr/share/zeroclaw/web-dist"
+
+# --- Agent ------------------------------------------------------------
+[agent]
+autonomy = "supervised"

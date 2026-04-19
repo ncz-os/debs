@@ -1,0 +1,30 @@
+Source: zeroclaw
+Section: admin
+Priority: optional
+Maintainer: Jason Perlow <jperlow@nvidia.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ curl,
+ ca-certificates
+Standards-Version: 4.7.0
+Homepage: https://github.com/zeroclaw-labs/zeroclaw
+Rules-Requires-Root: no
+
+Package: zeroclaw
+Architecture: arm64 amd64
+Depends:
+ ${misc:Depends},
+ adduser,
+ ca-certificates,
+ docker.io | docker-ce
+Recommends: tailscale
+Description: ZeroClaw AI agent runtime (pre-built binary)
+ Rust-based agentic AI runtime with low memory footprint (~22MB RSS on
+ Raspberry Pi 4). OpenAI-compatible gateway + web dashboard on port 42617.
+ .
+ Configured by default for Together AI (MiniMax-M2.7 narrative, Gemma-4
+ consultative). Per-skill sandboxing via Docker. See
+ /etc/zeroclaw/config.toml.
+ .
+ This package tracks upstream prereleases (latest beta build from master)
+ from the nclawzero internal apt repo.

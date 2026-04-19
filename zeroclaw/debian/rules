@@ -1,0 +1,61 @@
+#!/usr/bin/make -f
+# Builds a zeroclaw .deb by downloading the upstream pre-built tarball.
+# Version + SHA256 are bumped by .github/workflows/track-master.yml when
+# a new prerelease (beta) appears on https://github.com/zeroclaw-labs/zeroclaw.
+
+export DH_VERBOSE = 1
+
+# Bumped by track-master CI
+ZEROCLAW_VERSION = 0.7.3-beta.1051
+ZEROCLAW_SHA256_ARM64 = 2eb7fa9699e3e6064f7c882aa67f4f5fadc4002e1cdc588d924395d344e3bb3c
+ZEROCLAW_SHA256_AMD64 = ""
+
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+ifeq ($(DEB_HOST_ARCH),arm64)
+  ZC_TARGET = aarch64-unknown-linux-gnu
+  ZC_SHA256 = $(ZEROCLAW_SHA256_ARM64)
+else ifeq ($(DEB_HOST_ARCH),amd64)
+  ZC_TARGET = x86_64-unknown-linux-gnu
+  ZC_SHA256 = $(ZEROCLAW_SHA256_AMD64)
+else
+  $(error Unsupported arch: $(DEB_HOST_ARCH))
+endif
+
+ZC_TARBALL = zeroclaw-$(ZC_TARGET).tar.gz
+ZC_URL = https://github.com/zeroclaw-labs/zeroclaw/releases/download/v$(ZEROCLAW_VERSION)/$(ZC_TARBALL)
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	# Fetch upstream pre-built tarball
+	curl -fL --retry 3 -o $(ZC_TARBALL) $(ZC_URL)
+	echo "$(ZC_SHA256)  $(ZC_TARBALL)" | sha256sum -c -
+	tar xzf $(ZC_TARBALL)
+
+override_dh_auto_install:
+	# Binary
+	install -Dm0755 zeroclaw $(CURDIR)/debian/zeroclaw/usr/bin/zeroclaw
+	# Web dashboard (bundled in 0.7.x release tarballs)
+	install -d $(CURDIR)/debian/zeroclaw/usr/share/zeroclaw
+	cp -r web/dist $(CURDIR)/debian/zeroclaw/usr/share/zeroclaw/web-dist
+	chmod -R a+rX $(CURDIR)/debian/zeroclaw/usr/share/zeroclaw/web-dist
+	# Config (shipped in debian/, not from upstream)
+	install -Dm0600 debian/config.toml $(CURDIR)/debian/zeroclaw/etc/zeroclaw/config.toml
+	install -Dm0600 debian/env.in      $(CURDIR)/debian/zeroclaw/etc/zeroclaw/env
+	# Data dirs
+	install -d $(CURDIR)/debian/zeroclaw/var/lib/zeroclaw/skills
+	install -d $(CURDIR)/debian/zeroclaw/var/lib/zeroclaw/workspace
+
+override_dh_auto_clean:
+	rm -rf $(ZC_TARBALL) zeroclaw web
+	dh_auto_clean
+
+# The upstream binary is already stripped
+override_dh_strip:
+	:
+
+# Don't try to run dh_shlibdeps against a pre-built Rust binary
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params=--ignore-missing-info

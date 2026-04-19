@@ -1,0 +1,31 @@
+[Unit]
+Description=ZeroClaw AI Agent Runtime
+Documentation=https://github.com/zeroclaw-labs/zeroclaw
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=zeroclaw
+Group=zeroclaw
+WorkingDirectory=/var/lib/zeroclaw
+ExecStart=/usr/bin/zeroclaw daemon --config-dir /etc/zeroclaw
+Restart=always
+RestartSec=5
+EnvironmentFile=-/etc/zeroclaw/env
+LimitNOFILE=65536
+LimitNPROC=512
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/zeroclaw
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target
