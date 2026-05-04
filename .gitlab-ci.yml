@@ -5,7 +5,7 @@
 #     debian/changelog via dch, commit, trigger a build via resource_group.
 #  2. build-{arm64,amd64}: dpkg-buildpackage each deb for each arch.
 #  3. publish: rsync artifacts to ARGOS and run reprepro includedeb to
-#     push to the internal apt repo (http://192.168.207.22:8081/apt).
+#     push to the internal apt repo (http://10.0.0.22:8081/apt).
 #
 # Requires GitLab runner tagged "argos" (registered on ARGOS with
 # docker + sshpass + rsync access to /mnt/argonas/apt).
@@ -16,9 +16,9 @@ stages:
   - publish
 
 variables:
-  DEBEMAIL: "jperlow@nvidia.com"
+  DEBEMAIL: "jperlow@gmail.com"
   DEBFULLNAME: "Jason Perlow"
-  APT_HOST: "jasonperlow@192.168.207.22"
+  APT_HOST: "jasonperlow@10.0.0.22"
   APT_BASEDIR: "/mnt/argonas/apt"
 
 # Nightly: check upstream for new zeroclaw beta, bump, commit, trigger build.

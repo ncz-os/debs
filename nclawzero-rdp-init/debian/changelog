@@ -5,4 +5,4 @@ nclawzero-rdp-init (1.0.0-1) trixie; urgency=medium
     backend and seeds pi user password from /etc/nclawzero/initial-password.
   * Idempotent via /var/lib/nclawzero/rdp-init.done sentinel.
 
- -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 18:45:00 +0000
+ -- Jason Perlow <jperlow@gmail.com>  Sun, 19 Apr 2026 18:45:00 +0000
