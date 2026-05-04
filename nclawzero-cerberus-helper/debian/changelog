@@ -4,4 +4,4 @@ nclawzero-cerberus-helper (1.0.0-1) trixie; urgency=medium
   * Ships /usr/bin/ask-cerberus idempotent wrapper and
     /etc/nclawzero/cerberus.conf with endpoint/model/timeout defaults.
 
- -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 19:20:00 +0000
+ -- Jason Perlow <jperlow@gmail.com>  Sun, 19 Apr 2026 19:20:00 +0000

@@ -3,7 +3,7 @@ Upstream-Name: nclawzero-rdp-init
 Source: https://gitlab.internal.nvidia.com/perlowja/nclawzero-debs
 
 Files: *
-Copyright: 2026 Jason Perlow <jperlow@nvidia.com>
+Copyright: 2026 Jason Perlow <jperlow@gmail.com>
 License: Apache-2.0
 
 License: Apache-2.0

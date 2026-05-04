@@ -3,7 +3,7 @@ zeroclaw (0.7.3~beta.1051-2) trixie; urgency=medium
   * Drop --config-dir flag (treated state dir as /etc/zeroclaw); symlink
     config
 
- -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 19:35:46 -0400
+ -- Jason Perlow <jperlow@gmail.com>  Sun, 19 Apr 2026 19:35:46 -0400
 
 zeroclaw (0.7.3~beta.1051-1) trixie; urgency=medium
 
@@ -15,4 +15,4 @@ zeroclaw (0.7.3~beta.1051-1) trixie; urgency=medium
   * systemd unit: zeroclaw.service (User=zeroclaw, --config-dir).
   * Includes bundled web dashboard at /usr/share/zeroclaw/web-dist.
 
- -- Jason Perlow <jperlow@nvidia.com>  Sun, 19 Apr 2026 18:30:00 +0000
+ -- Jason Perlow <jperlow@gmail.com>  Sun, 19 Apr 2026 18:30:00 +0000

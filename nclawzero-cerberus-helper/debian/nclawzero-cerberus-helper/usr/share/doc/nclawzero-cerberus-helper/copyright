@@ -2,7 +2,7 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: nclawzero-cerberus-helper
 
 Files: *
-Copyright: 2026 Jason Perlow <jperlow@nvidia.com>
+Copyright: 2026 Jason Perlow <jperlow@gmail.com>
 License: Apache-2.0
 
 License: Apache-2.0

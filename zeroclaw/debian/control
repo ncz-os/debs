@@ -1,7 +1,7 @@
 Source: zeroclaw
 Section: admin
 Priority: optional
-Maintainer: Jason Perlow <jperlow@nvidia.com>
+Maintainer: Jason Perlow <jperlow@gmail.com>
 Build-Depends:
  debhelper-compat (= 13),
  curl,

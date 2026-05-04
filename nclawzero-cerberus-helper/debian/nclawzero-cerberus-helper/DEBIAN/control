@@ -1,7 +1,7 @@
 Package: nclawzero-cerberus-helper
 Version: 1.0.0-1
 Architecture: all
-Maintainer: Jason Perlow <jperlow@nvidia.com>
+Maintainer: Jason Perlow <jperlow@gmail.com>
 Installed-Size: 15
 Depends: curl, python3
 Section: utils
