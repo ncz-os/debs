@@ -24,33 +24,30 @@ variables:
 # Nightly: check upstream for new zeroclaw beta, bump, commit, trigger build.
 track-zeroclaw:
   stage: track
-  tags: [argos]
+  tags: [argos, ncz-os]
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
-  image: debian:trixie
-  before_script:
-    - apt-get update -q && apt-get install -y -q curl jq git devscripts
   script:
-    - ./ci/bump-zeroclaw.sh
+    - docker run --rm -v $CI_PROJECT_DIR:/build -w /build debian:trixie bash -c "apt-get update -q && apt-get install -y -q curl jq git devscripts && ./ci/bump-zeroclaw.sh"
 
 # Per-package matrix build
 .build-template:
   stage: build
-  tags: [argos]
-  image: debian:trixie
-  before_script:
-    - dpkg --add-architecture ${DEB_ARCH}
-    - apt-get update -q
-    - apt-get install -y -q devscripts debhelper dpkg-dev curl ca-certificates
-    - |
-      if [ "$DEB_ARCH" = "arm64" ] && [ "$(dpkg --print-architecture)" != "arm64" ]; then
-        apt-get install -y -q binutils-aarch64-linux-gnu libc6:arm64 libgcc-s1:arm64
-      fi
+  tags: [argos, ncz-os]
   script:
-    - cd ${PKG}
-    - dpkg-buildpackage -a${DEB_ARCH} -us -uc -b
-    - mkdir -p ../out/${DEB_ARCH}
-    - mv ../*.deb ../*.buildinfo ../*.changes ../out/${DEB_ARCH}/ 2>/dev/null || true
+    - |
+      docker run --rm -v $CI_PROJECT_DIR:/build -w /build debian:trixie bash -c "
+        dpkg --add-architecture ${DEB_ARCH} &&
+        apt-get update -q &&
+        apt-get install -y -q devscripts debhelper dpkg-dev curl ca-certificates &&
+        if [ '${DEB_ARCH}' = 'arm64' ] && [ \"\$(dpkg --print-architecture)\" != 'arm64' ]; then
+          apt-get install -y -q binutils-aarch64-linux-gnu libc6:arm64 libgcc-s1:arm64
+        fi &&
+        cd ${PKG} &&
+        dpkg-buildpackage -a${DEB_ARCH} -us -uc -b &&
+        mkdir -p ../out/${DEB_ARCH} &&
+        mv ../*.deb ../*.buildinfo ../*.changes ../out/${DEB_ARCH}/ 2>/dev/null || true
+      "
   artifacts:
     paths: [out/]
     expire_in: 1 week
@@ -74,16 +71,13 @@ build:cerberus-helper:
 # Publish all built debs to reprepro on ARGONAS via ARGOS
 publish-to-apt:
   stage: publish
-  tags: [argos]
-  image: debian:trixie
+  tags: [argos, ncz-os]
   needs:
     - build:zeroclaw:arm64
     - build:zeroclaw:amd64
     - build:rdp-init
     - build:firstboot
     - build:cerberus-helper
-  before_script:
-    - apt-get update -q && apt-get install -y -q rsync openssh-client sshpass
   script:
     - |
       for f in out/*/*.deb; do
