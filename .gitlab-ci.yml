@@ -48,6 +48,12 @@ track-zeroclaw:
         mkdir -p ../out/${DEB_ARCH} &&
         mv ../*.deb ../*.buildinfo ../*.changes ../out/${DEB_ARCH}/ 2>/dev/null || true
       "
+  after_script:
+    # dpkg-buildpackage runs as root in the container and leaves root-owned
+    # files in the shared shell-runner workspace, which makes the next job's
+    # `git clean` fail with "Permission denied" during get_sources. Hand
+    # ownership back to the runner user.
+    - docker run --rm -v "$CI_PROJECT_DIR:/build" -w /build debian:trixie chown -R "$(id -u):$(id -g)" . || true
   artifacts:
     paths: [out/]
     expire_in: 1 week
@@ -87,5 +93,8 @@ publish-to-apt:
         sshpass -p "$APT_SSH_PASS" ssh -o StrictHostKeyChecking=accept-new "$APT_HOST" \
           "reprepro -b $APT_BASEDIR includedeb trixie /tmp/$(basename $f) && rm -f /tmp/$(basename $f)"
       done
+  # Publishing needs the apt-host SSH secret. Skip cleanly until APT_SSH_PASS is
+  # configured (project CI/CD variable) so the build stage isn't blocked by an
+  # unconfigured deploy step.
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - if: '$CI_COMMIT_BRANCH == "master" && $APT_SSH_PASS'
