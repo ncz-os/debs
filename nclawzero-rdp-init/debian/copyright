@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: nclawzero-rdp-init
-Source: https://gitlab.internal.nvidia.com/perlowja/nclawzero-debs
+Source: https://gitlab.com/ncz-os/debs
 
 Files: *
 Copyright: 2026 Jason Perlow <jperlow@gmail.com>
